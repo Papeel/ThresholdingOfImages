@@ -8,6 +8,13 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.highgui.HighGui;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -21,9 +28,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class MainWindow extends javax.swing.JFrame {
 
-    JFileChooser fc  = new JFileChooser();
+    
     public MainWindow() {
         initComponents();
+    }
+    static {
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
     
@@ -36,6 +46,9 @@ public class MainWindow extends javax.swing.JFrame {
         jMenuBar2 = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
         jMenuItemOpen = new javax.swing.JMenuItem();
+        jMenuItemSave = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        jMenuItemExit = new javax.swing.JMenuItem();
         jMenuEdit = new javax.swing.JMenu();
         jMenuItemThreshold = new javax.swing.JMenuItem();
         jMenuHelp = new javax.swing.JMenu();
@@ -53,11 +66,11 @@ public class MainWindow extends javax.swing.JFrame {
         canvas.setLayout(canvasLayout);
         canvasLayout.setHorizontalGroup(
             canvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 526, Short.MAX_VALUE)
+            .addGap(0, 528, Short.MAX_VALUE)
         );
         canvasLayout.setVerticalGroup(
             canvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 407, Short.MAX_VALUE)
+            .addGap(0, 409, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -68,9 +81,7 @@ public class MainWindow extends javax.swing.JFrame {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(canvas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0))
+            .addComponent(canvas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         jMenuFile.setText("Archivo");
@@ -82,6 +93,23 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
         jMenuFile.add(jMenuItemOpen);
+
+        jMenuItemSave.setText("Guardar");
+        jMenuItemSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemSaveActionPerformed(evt);
+            }
+        });
+        jMenuFile.add(jMenuItemSave);
+        jMenuFile.add(jSeparator1);
+
+        jMenuItemExit.setText("Salir");
+        jMenuItemExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemExitActionPerformed(evt);
+            }
+        });
+        jMenuFile.add(jMenuItemExit);
 
         jMenuBar2.add(jMenuFile);
 
@@ -121,8 +149,10 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        System.out.println("");
-        System.exit(0);
+        int res = JOptionPane.showConfirmDialog(null, "¿Seguro que quieres salir?", "Aviso", JOptionPane.YES_NO_CANCEL_OPTION);
+        if(res == JOptionPane.YES_OPTION){
+            System.exit(0);
+        }
     }//GEN-LAST:event_formWindowClosing
 
     private void jMenuItemOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemOpenActionPerformed
@@ -134,24 +164,81 @@ public class MainWindow extends javax.swing.JFrame {
         
         int res = fc.showOpenDialog(null);
         if( res == JFileChooser.APPROVE_OPTION){
+            this.currentImagen = Imgcodecs.imread(fc.getSelectedFile().getAbsolutePath(),3);
+            try{
+                changeImage(currentImagen);
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(null, "La imagen no tiene un formato adecuado", "Mensaje", JOptionPane.ERROR_MESSAGE);
+            }
             
-            canvas.setBufferImage(getImage(fc.getSelectedFile()));
             repaint();
         }
+        fc.resetChoosableFileFilters();
         
     }//GEN-LAST:event_jMenuItemOpenActionPerformed
 
     private void jMenuItemThresholdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemThresholdActionPerformed
-        String threshold = JOptionPane.showInputDialog(null, "Introduzca un umbral entre 0 y 255", "Selección de umbral", JOptionPane.PLAIN_MESSAGE);
+        if(this.currentImagen != null){
+            String threshold = JOptionPane.showInputDialog(null, "Introduzca un umbral entre 0 y 255", "Selección de umbral", JOptionPane.PLAIN_MESSAGE);
+            if(threshold == null)return;
+            try{ 
+                this.currentImagen = umbralizar(this.currentImagen, Integer.parseInt(threshold));
+     
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(null, "Debes añadir un número", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            
+            changeImage(currentImagen);
+            repaint();
+        }else{
+            JOptionPane.showMessageDialog(null, "Debes abrir una imagen para poder umbralizar", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+        }
         
     }//GEN-LAST:event_jMenuItemThresholdActionPerformed
 
+    private void jMenuItemSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSaveActionPerformed
+        if( this.currentImagen != null){
+            int res = fc.showSaveDialog(null);
+            if( res == JFileChooser.APPROVE_OPTION){
+                Imgcodecs.imwrite(fc.getSelectedFile().getPath(), this.currentImagen);
+            }
+        }else{
+            JOptionPane.showMessageDialog(null, "Debes abrir una imagen para poder guardar", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+        }
+        
+    }//GEN-LAST:event_jMenuItemSaveActionPerformed
+
+    private void jMenuItemExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemExitActionPerformed
+        int res = JOptionPane.showConfirmDialog(null, "¿Seguro que quieres salir?", "Aviso", JOptionPane.YES_NO_CANCEL_OPTION);
+        if(res == JOptionPane.YES_OPTION){
+            System.exit(0);
+        }
+    }//GEN-LAST:event_jMenuItemExitActionPerformed
+
+    private void changeImage(Mat image){
+        canvas.setBufferImage((BufferedImage)HighGui.toBufferedImage(image));
+    }
     private BufferedImage getImage(File file) {
         BufferedImage bI = null;
         try {
             bI = ImageIO.read(file);
         } catch(IOException e) {}
         return bI;
+    }
+     private Mat umbralizar(Mat imagen_original, Integer umbral) {
+        // crear dos imágenes en niveles de gris con el mismo tamaño que la original
+        Mat imagenGris = new Mat(imagen_original.rows(), imagen_original.cols(), CvType.CV_8U);
+        Mat imagenUmbralizada = new Mat(imagen_original.rows(), imagen_original.cols(),
+CvType.CV_8U);
+         // convierte a niveles de grises la imagen original
+        Imgproc.cvtColor(imagen_original, imagenGris, Imgproc.COLOR_BGR2GRAY);
+         
+        // umbraliza la imagen:  
+        // ‐ píxeles con nivel de gris > umbral se ponen a 1
+        // ‐ píxeles con nivel de gris <= umbra se ponen a 0
+        Imgproc.threshold(imagenGris, imagenUmbralizada, umbral, 255, Imgproc.THRESH_BINARY);
+        // se devuelve la imagen umbralizada
+        return imagenUmbralizada;
     }
     /**
      * @param args the command line arguments
@@ -187,7 +274,8 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
     }
-
+    private JFileChooser fc  = new JFileChooser();
+    private Mat currentImagen;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem JMenuAbout;
     private Canvas canvas;
@@ -195,8 +283,11 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JMenu jMenuEdit;
     private javax.swing.JMenu jMenuFile;
     private javax.swing.JMenu jMenuHelp;
+    private javax.swing.JMenuItem jMenuItemExit;
     private javax.swing.JMenuItem jMenuItemOpen;
+    private javax.swing.JMenuItem jMenuItemSave;
     private javax.swing.JMenuItem jMenuItemThreshold;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
     // End of variables declaration//GEN-END:variables
 }
