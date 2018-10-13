@@ -1,12 +1,5 @@
-
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
-
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /*
@@ -20,26 +13,26 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * @author Entrar
  */
 public class MainWindow extends javax.swing.JFrame {
-
-    JFileChooser fc  = new JFileChooser();
+    
     public MainWindow() {
         initComponents();
+        fc.addChoosableFileFilter(new FileNameExtensionFilter("JPG imagen", "jpg"));
+        fc.addChoosableFileFilter(new FileNameExtensionFilter("PNG imagen", "png"));
     }
-
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
+        imagePanel = new javax.swing.JPanel();
         canvas = new Canvas();
-        jMenuBar2 = new javax.swing.JMenuBar();
-        jMenuFile = new javax.swing.JMenu();
-        jMenuItemOpen = new javax.swing.JMenuItem();
-        jMenuEdit = new javax.swing.JMenu();
-        jMenuItemThreshold = new javax.swing.JMenuItem();
-        jMenuHelp = new javax.swing.JMenu();
-        JMenuAbout = new javax.swing.JMenuItem();
+        menuBar = new javax.swing.JMenuBar();
+        menuFile = new javax.swing.JMenu();
+        menuItemOpen = new javax.swing.JMenuItem();
+        menuEdit = new javax.swing.JMenu();
+        menuItemThreshold = new javax.swing.JMenuItem();
+        menuHelp = new javax.swing.JMenu();
+        menuItemAbout = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(450, 450));
@@ -60,61 +53,61 @@ public class MainWindow extends javax.swing.JFrame {
             .addGap(0, 407, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout imagePanelLayout = new javax.swing.GroupLayout(imagePanel);
+        imagePanel.setLayout(imagePanelLayout);
+        imagePanelLayout.setHorizontalGroup(
+            imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(canvas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        imagePanelLayout.setVerticalGroup(
+            imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(imagePanelLayout.createSequentialGroup()
                 .addComponent(canvas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(0, 0, 0))
         );
 
-        jMenuFile.setText("Archivo");
+        menuFile.setText("Archivo");
 
-        jMenuItemOpen.setText("Abrir");
-        jMenuItemOpen.addActionListener(new java.awt.event.ActionListener() {
+        menuItemOpen.setText("Abrir");
+        menuItemOpen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemOpenActionPerformed(evt);
+                menuItemOpenActionPerformed(evt);
             }
         });
-        jMenuFile.add(jMenuItemOpen);
+        menuFile.add(menuItemOpen);
 
-        jMenuBar2.add(jMenuFile);
+        menuBar.add(menuFile);
 
-        jMenuEdit.setText("Editar");
+        menuEdit.setText("Editar");
 
-        jMenuItemThreshold.setText("Elegir umbral");
-        jMenuItemThreshold.addActionListener(new java.awt.event.ActionListener() {
+        menuItemThreshold.setText("Elegir umbral");
+        menuItemThreshold.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemThresholdActionPerformed(evt);
+                menuItemThresholdActionPerformed(evt);
             }
         });
-        jMenuEdit.add(jMenuItemThreshold);
+        menuEdit.add(menuItemThreshold);
 
-        jMenuBar2.add(jMenuEdit);
+        menuBar.add(menuEdit);
 
-        jMenuHelp.setText("Ayuda");
+        menuHelp.setText("Ayuda");
 
-        JMenuAbout.setText("Acerca de");
-        jMenuHelp.add(JMenuAbout);
+        menuItemAbout.setText("Acerca de");
+        menuHelp.add(menuItemAbout);
 
-        jMenuBar2.add(jMenuHelp);
+        menuBar.add(menuHelp);
 
-        setJMenuBar(jMenuBar2);
+        setJMenuBar(menuBar);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(imagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(imagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -125,34 +118,18 @@ public class MainWindow extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_formWindowClosing
 
-    private void jMenuItemOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemOpenActionPerformed
-        FileFilter filter = null;
-        filter = new FileNameExtensionFilter("JPG imagen", "jpg");
-        fc.addChoosableFileFilter(filter);
-        filter = new FileNameExtensionFilter("PNG imagen", "png");
-        fc.addChoosableFileFilter(filter);
-        
-        int res = fc.showOpenDialog(null);
-        if( res == JFileChooser.APPROVE_OPTION){
-            
-            canvas.setBufferImage(getImage(fc.getSelectedFile()));
+    private void menuItemOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenActionPerformed
+        if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            canvas.setImage(fc.getSelectedFile());
             repaint();
         }
-        
-    }//GEN-LAST:event_jMenuItemOpenActionPerformed
+    }//GEN-LAST:event_menuItemOpenActionPerformed
 
-    private void jMenuItemThresholdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemThresholdActionPerformed
+    private void menuItemThresholdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemThresholdActionPerformed
         String threshold = JOptionPane.showInputDialog(null, "Introduzca un umbral entre 0 y 255", "Selección de umbral", JOptionPane.PLAIN_MESSAGE);
         
-    }//GEN-LAST:event_jMenuItemThresholdActionPerformed
+    }//GEN-LAST:event_menuItemThresholdActionPerformed
 
-    private BufferedImage getImage(File file) {
-        BufferedImage bI = null;
-        try {
-            bI = ImageIO.read(file);
-        } catch(IOException e) {}
-        return bI;
-    }
     /**
      * @param args the command line arguments
      */
@@ -181,22 +158,21 @@ public class MainWindow extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainWindow().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new MainWindow().setVisible(true);
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenuItem JMenuAbout;
     private Canvas canvas;
-    private javax.swing.JMenuBar jMenuBar2;
-    private javax.swing.JMenu jMenuEdit;
-    private javax.swing.JMenu jMenuFile;
-    private javax.swing.JMenu jMenuHelp;
-    private javax.swing.JMenuItem jMenuItemOpen;
-    private javax.swing.JMenuItem jMenuItemThreshold;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel imagePanel;
+    private javax.swing.JMenuBar menuBar;
+    private javax.swing.JMenu menuEdit;
+    private javax.swing.JMenu menuFile;
+    private javax.swing.JMenu menuHelp;
+    private javax.swing.JMenuItem menuItemAbout;
+    private javax.swing.JMenuItem menuItemOpen;
+    private javax.swing.JMenuItem menuItemThreshold;
     // End of variables declaration//GEN-END:variables
+    private final JFileChooser fc  = new JFileChooser();
 }

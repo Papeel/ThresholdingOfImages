@@ -1,28 +1,28 @@
-
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 public class Canvas extends JPanel{
     
-    
-    private BufferedImage currentImage;
-    private String imagePath;
+    private File currentImage;
     
     @Override
     public void paintComponent(Graphics g) {        
-        g.drawImage(currentImage, 0, 0, this.getWidth(), this.getHeight(), this);        
+        g.drawImage(getBufferedImage(currentImage), 0, 0, this.getWidth(), this.getHeight(), this);        
     }
     
-    void setBufferImage(BufferedImage bI) {
-        this.currentImage = bI;
+    void setImage(File image) {
+        this.currentImage = image;
     }
-
-    public String getImagePath() {
-        return imagePath;
-    }
-
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    
+    private BufferedImage getBufferedImage(File file) {
+        BufferedImage bI = null;
+        try {
+            bI = ImageIO.read(file);
+        } catch(IllegalArgumentException | IOException e) {}
+        return bI;
     }
 }
