@@ -124,6 +124,11 @@ public class MainWindow extends javax.swing.JFrame {
         menuHelp.setText("Ayuda");
 
         menuItemAbout.setText("Acerca de");
+        menuItemAbout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemAboutActionPerformed(evt);
+            }
+        });
         menuHelp.add(menuItemAbout);
 
         menuBar.add(menuHelp);
@@ -179,6 +184,14 @@ public class MainWindow extends javax.swing.JFrame {
             System.exit(0);
         }
     }//GEN-LAST:event_menuItemExitActionPerformed
+
+    private void menuItemAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemAboutActionPerformed
+        JOptionPane.showMessageDialog(
+                null,
+                "Nelson González Machín\nSamuel Guerra Marrero",
+                "Autores",
+                JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_menuItemAboutActionPerformed
         
     private Mat thresholding(Mat originalImage, Integer threshold) {
         Mat grayImage = new Mat(originalImage.rows(), originalImage.cols(), CvType.CV_8U);
