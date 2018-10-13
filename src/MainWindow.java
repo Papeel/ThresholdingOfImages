@@ -1,7 +1,4 @@
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -43,6 +40,7 @@ public class MainWindow extends javax.swing.JFrame {
         menuBar = new javax.swing.JMenuBar();
         menuFile = new javax.swing.JMenu();
         menuItemOpen = new javax.swing.JMenuItem();
+        menuItemSave = new javax.swing.JMenuItem();
         menuEdit = new javax.swing.JMenu();
         menuItemThreshold = new javax.swing.JMenuItem();
         menuHelp = new javax.swing.JMenu();
@@ -90,6 +88,14 @@ public class MainWindow extends javax.swing.JFrame {
         });
         menuFile.add(menuItemOpen);
 
+        menuItemSave.setText("Guardar");
+        menuItemSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemSaveActionPerformed(evt);
+            }
+        });
+        menuFile.add(menuItemSave);
+
         menuBar.add(menuFile);
 
         menuEdit.setText("Editar");
@@ -135,24 +141,24 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void menuItemOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenActionPerformed
         if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
-            canvas.showImage(getBufferedImage(fc.getSelectedFile()));
+            canvas.showImage(canvas.getBufferedImage(fc.getSelectedFile()));
     }//GEN-LAST:event_menuItemOpenActionPerformed
     
     private void menuItemThresholdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemThresholdActionPerformed
-        String threshold = JOptionPane.showInputDialog(null, "Introduzca un umbral entre 0 y 255", "Selección de umbral", JOptionPane.PLAIN_MESSAGE);
-        Mat image = Imgcodecs.imread(fc.getSelectedFile().getPath());
-        image = thresholding(image, Integer.parseInt(threshold));
-        canvas.showImage((BufferedImage) HighGui.toBufferedImage(image));
+        String threshold = JOptionPane.showInputDialog(
+                null,
+                "Introduzca un umbral entre 0 y 255", "Selección de umbral",
+                JOptionPane.PLAIN_MESSAGE);
+        this.currentImage = thresholding(Imgcodecs.imread(fc.getSelectedFile().getPath()),
+                Integer.parseInt(threshold));
+        canvas.showImage((BufferedImage) HighGui.toBufferedImage(this.currentImage));
     }//GEN-LAST:event_menuItemThresholdActionPerformed
-    
-    private BufferedImage getBufferedImage(File file) {
-        BufferedImage bI = null;
-        try {
-            bI = ImageIO.read(file);
-        } catch(IOException e) {}
-        return bI;
-    }
-    
+
+    private void menuItemSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSaveActionPerformed
+        if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
+            Imgcodecs.imwrite(fc.getSelectedFile().getPath(), this.currentImage);
+    }//GEN-LAST:event_menuItemSaveActionPerformed
+        
     private Mat thresholding(Mat originalImage, Integer threshold) {
         Mat grayImage = new Mat(originalImage.rows(), originalImage.cols(), CvType.CV_8U);
         Mat thresholdizedImage = new Mat(originalImage.rows(), originalImage.cols(), CvType.CV_8U);
@@ -203,7 +209,9 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JMenu menuHelp;
     private javax.swing.JMenuItem menuItemAbout;
     private javax.swing.JMenuItem menuItemOpen;
+    private javax.swing.JMenuItem menuItemSave;
     private javax.swing.JMenuItem menuItemThreshold;
     // End of variables declaration//GEN-END:variables
     private final JFileChooser fc  = new JFileChooser();
+    private Mat currentImage;
 }
