@@ -23,8 +23,8 @@ public class MainWindow extends javax.swing.JFrame {
     
     public MainWindow() {
         initComponents();
-        fc.addChoosableFileFilter(new FileNameExtensionFilter("JPG imagen", "jpg"));
-        fc.addChoosableFileFilter(new FileNameExtensionFilter("PNG imagen", "png"));
+        fc.addChoosableFileFilter(new FileNameExtensionFilter("Imagen JPG", "jpg"));
+        fc.addChoosableFileFilter(new FileNameExtensionFilter("Imagen PNG", "png"));
     }
     
     static {
@@ -41,6 +41,8 @@ public class MainWindow extends javax.swing.JFrame {
         menuFile = new javax.swing.JMenu();
         menuItemOpen = new javax.swing.JMenuItem();
         menuItemSave = new javax.swing.JMenuItem();
+        fileSeparator = new javax.swing.JPopupMenu.Separator();
+        menuItemExit = new javax.swing.JMenuItem();
         menuEdit = new javax.swing.JMenu();
         menuItemThreshold = new javax.swing.JMenuItem();
         menuHelp = new javax.swing.JMenu();
@@ -95,6 +97,15 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
         menuFile.add(menuItemSave);
+        menuFile.add(fileSeparator);
+
+        menuItemExit.setText("Salir");
+        menuItemExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemExitActionPerformed(evt);
+            }
+        });
+        menuFile.add(menuItemExit);
 
         menuBar.add(menuFile);
 
@@ -158,6 +169,16 @@ public class MainWindow extends javax.swing.JFrame {
         if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
             Imgcodecs.imwrite(fc.getSelectedFile().getPath(), this.currentImage);
     }//GEN-LAST:event_menuItemSaveActionPerformed
+
+    private void menuItemExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemExitActionPerformed
+        if (JOptionPane.showConfirmDialog(
+                null,
+                "¿Seguro que quieres salir?",
+                "Aviso",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            System.exit(0);
+        }
+    }//GEN-LAST:event_menuItemExitActionPerformed
         
     private Mat thresholding(Mat originalImage, Integer threshold) {
         Mat grayImage = new Mat(originalImage.rows(), originalImage.cols(), CvType.CV_8U);
@@ -202,12 +223,14 @@ public class MainWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private Canvas canvas;
+    private javax.swing.JPopupMenu.Separator fileSeparator;
     private javax.swing.JPanel imagePanel;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenu menuEdit;
     private javax.swing.JMenu menuFile;
     private javax.swing.JMenu menuHelp;
     private javax.swing.JMenuItem menuItemAbout;
+    private javax.swing.JMenuItem menuItemExit;
     private javax.swing.JMenuItem menuItemOpen;
     private javax.swing.JMenuItem menuItemSave;
     private javax.swing.JMenuItem menuItemThreshold;
