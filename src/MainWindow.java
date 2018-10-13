@@ -1,6 +1,16 @@
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.highgui.HighGui;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -18,6 +28,10 @@ public class MainWindow extends javax.swing.JFrame {
         initComponents();
         fc.addChoosableFileFilter(new FileNameExtensionFilter("JPG imagen", "jpg"));
         fc.addChoosableFileFilter(new FileNameExtensionFilter("PNG imagen", "png"));
+    }
+    
+    static {
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
     
     @SuppressWarnings("unchecked")
@@ -114,22 +128,39 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        System.out.println("");
-        System.exit(0);
+        if (JOptionPane.showConfirmDialog(null, "¿Seguro que quieres salir?", 
+                "Aviso", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+            System.exit(0);
     }//GEN-LAST:event_formWindowClosing
 
     private void menuItemOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenActionPerformed
-        if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            canvas.setImage(fc.getSelectedFile());
-            repaint();
-        }
+        if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+            canvas.showImage(getBufferedImage(fc.getSelectedFile()));
     }//GEN-LAST:event_menuItemOpenActionPerformed
-
+    
     private void menuItemThresholdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemThresholdActionPerformed
         String threshold = JOptionPane.showInputDialog(null, "Introduzca un umbral entre 0 y 255", "Selección de umbral", JOptionPane.PLAIN_MESSAGE);
-        
+        Mat image = Imgcodecs.imread(fc.getSelectedFile().getPath());
+        image = thresholding(image, Integer.parseInt(threshold));
+        canvas.showImage((BufferedImage) HighGui.toBufferedImage(image));
     }//GEN-LAST:event_menuItemThresholdActionPerformed
-
+    
+    private BufferedImage getBufferedImage(File file) {
+        BufferedImage bI = null;
+        try {
+            bI = ImageIO.read(file);
+        } catch(IOException e) {}
+        return bI;
+    }
+    
+    private Mat thresholding(Mat originalImage, Integer threshold) {
+        Mat grayImage = new Mat(originalImage.rows(), originalImage.cols(), CvType.CV_8U);
+        Mat thresholdizedImage = new Mat(originalImage.rows(), originalImage.cols(), CvType.CV_8U);
+        Imgproc.cvtColor(originalImage, grayImage, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.threshold(grayImage, thresholdizedImage, threshold, 255, Imgproc.THRESH_BINARY);
+        return thresholdizedImage;
+    }
+    
     /**
      * @param args the command line arguments
      */
