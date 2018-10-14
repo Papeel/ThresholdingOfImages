@@ -273,6 +273,7 @@ public class MainWindow extends javax.swing.JFrame {
             int res = fc.showSaveDialog(null);
             if( res == JFileChooser.APPROVE_OPTION){
                 Imgcodecs.imwrite(fc.getSelectedFile().getPath(), this.modificatedImage);
+                JOptionPane.showMessageDialog(null, "La imagen se ha guardado correctamente", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
             }
         }else{
             JOptionPane.showMessageDialog(null, "Debes abrir y umbralizar una imagen para poder guardar el resultado", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
