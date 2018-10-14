@@ -224,7 +224,6 @@ public class MainWindow extends javax.swing.JFrame {
         fc.addChoosableFileFilter(filter);
         filter = new FileNameExtensionFilter("PNG imagen", "png");
         fc.addChoosableFileFilter(filter);
-        
         int res = fc.showOpenDialog(null);
         if( res == JFileChooser.APPROVE_OPTION){
             this.currentImagen = Imgcodecs.imread(fc.getSelectedFile().getAbsolutePath());
