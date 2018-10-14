@@ -121,8 +121,10 @@ public class MainWindow extends javax.swing.JFrame {
             .addComponent(canvas1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Original");
 
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Resultado");
 
         jMenuFile.setText("Archivo");
@@ -255,8 +257,6 @@ public class MainWindow extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "Debes añadir un número (entre 0 y 255) ", "Error", JOptionPane.ERROR_MESSAGE);
                 }
                 
-                
-                
             }catch(Exception e){
                 JOptionPane.showMessageDialog(null, "Debes añadir un número (entre 0 y 255) ", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -273,8 +273,13 @@ public class MainWindow extends javax.swing.JFrame {
         if( this.modificatedImage != null){
             int res = fc.showSaveDialog(null);
             if( res == JFileChooser.APPROVE_OPTION){
-                Imgcodecs.imwrite(fc.getSelectedFile().getPath(), this.modificatedImage);
-                JOptionPane.showMessageDialog(null, "La imagen se ha guardado correctamente", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+                try{
+                    Imgcodecs.imwrite(fc.getSelectedFile().getPath(), this.modificatedImage);
+                    JOptionPane.showMessageDialog(null, "La imagen se ha guardado correctamente", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+                }catch(Exception e){
+                    JOptionPane.showMessageDialog(null, "Añada un extensión a la imagen \npor ejemplo nombre.jpg o nombre.png", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+                }
+                
             }
         }else{
             JOptionPane.showMessageDialog(null, "Debes abrir y umbralizar una imagen para poder guardar el resultado", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
