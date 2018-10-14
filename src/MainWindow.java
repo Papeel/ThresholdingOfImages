@@ -232,6 +232,7 @@ public class MainWindow extends javax.swing.JFrame {
                 canvas.setBufferImage((BufferedImage)HighGui.toBufferedImage(this.currentImagen));
             }catch(Exception e){
                 JOptionPane.showMessageDialog(null, "La imagen no tiene un formato adecuado", "Mensaje", JOptionPane.ERROR_MESSAGE);
+                this.currentImagen=null;
             }
             
             repaint();
@@ -245,8 +246,16 @@ public class MainWindow extends javax.swing.JFrame {
             String threshold = JOptionPane.showInputDialog(null, "Introduzca un umbral entre 0 y 255", "Selección de umbral", JOptionPane.PLAIN_MESSAGE);
             if(threshold == null)return;
             try{ 
-                this.modificatedImage = umbralizar(this.currentImagen, Integer.parseInt(threshold));
-                canvas1.setBufferImage((BufferedImage)HighGui.toBufferedImage(this.modificatedImage));
+                int data = Integer.parseInt(threshold);
+                if(data>=0 && data<=255){
+                    this.modificatedImage = umbralizar(this.currentImagen, data);
+                    canvas1.setBufferImage((BufferedImage)HighGui.toBufferedImage(this.modificatedImage));
+                }else{
+                    JOptionPane.showMessageDialog(null, "Debes añadir un número (entre 0 y 255) ", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                
+                
+                
             }catch(Exception e){
                 JOptionPane.showMessageDialog(null, "Debes añadir un número (entre 0 y 255) ", "Error", JOptionPane.ERROR_MESSAGE);
             }
