@@ -230,6 +230,8 @@ public class MainWindow extends javax.swing.JFrame {
             this.currentImagen = Imgcodecs.imread(fc.getSelectedFile().getAbsolutePath());
             try{
                 canvas.setBufferImage((BufferedImage)HighGui.toBufferedImage(this.currentImagen));
+                this.modificatedImage = null;
+                canvas1.setBufferImage(null);
             }catch(Exception e){
                 JOptionPane.showMessageDialog(null, "La imagen no tiene un formato adecuado", "Mensaje", JOptionPane.ERROR_MESSAGE);
                 this.currentImagen=null;
