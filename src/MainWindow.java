@@ -9,22 +9,10 @@ import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author Entrar
- */
 public class MainWindow extends javax.swing.JFrame {
     
     public MainWindow() {
         initComponents();
-        fc.addChoosableFileFilter(new FileNameExtensionFilter("Imagen JPG", "jpg"));
-        fc.addChoosableFileFilter(new FileNameExtensionFilter("Imagen PNG", "png"));
     }
     
     static {
@@ -150,29 +138,80 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        if (JOptionPane.showConfirmDialog(null, "¿Seguro que quieres salir?", 
-                "Aviso", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+        if (JOptionPane.showConfirmDialog(
+                null,
+                "¿Seguro que quieres salir?",
+                "Aviso",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
             System.exit(0);
     }//GEN-LAST:event_formWindowClosing
 
     private void menuItemOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenActionPerformed
-        if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
-            canvas.showImage(canvas.getBufferedImage(fc.getSelectedFile()));
+        fc.addChoosableFileFilter(new FileNameExtensionFilter("Imagen JPG", "jpg"));
+        fc.addChoosableFileFilter(new FileNameExtensionFilter("Imagen PNG", "png"));
+        if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            this.currentImage = Imgcodecs.imread(fc.getSelectedFile().getPath());
+            try {
+                canvas.showImage((BufferedImage)HighGui.toBufferedImage(this.currentImage));
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "El archivo seleccionado no es una imagen.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                this.currentImage = null;
+            }
+        }
+        fc.resetChoosableFileFilters();
     }//GEN-LAST:event_menuItemOpenActionPerformed
     
     private void menuItemThresholdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemThresholdActionPerformed
-        String threshold = JOptionPane.showInputDialog(
+        if (this.currentImage != null) {
+            Integer threshold;
+            String newThreshold = JOptionPane.showInputDialog(
                 null,
                 "Introduzca un umbral entre 0 y 255", "Selección de umbral",
                 JOptionPane.PLAIN_MESSAGE);
-        this.currentImage = thresholding(Imgcodecs.imread(fc.getSelectedFile().getPath()),
-                Integer.parseInt(threshold));
-        canvas.showImage((BufferedImage) HighGui.toBufferedImage(this.currentImage));
+            if (newThreshold != null) {
+                try {
+                    threshold = Integer.parseInt(newThreshold);
+                    if (threshold >= 0 && threshold <= 255) {
+                        this.currentImage = thresholding(
+                            Imgcodecs.imread(fc.getSelectedFile().getPath()),
+                            threshold);
+                        canvas.showImage((BufferedImage) HighGui.toBufferedImage(this.currentImage));
+                    } else
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Debes elegir un número entre 0 y 255",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Debes elegir un número",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } else
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Debes abrir una imagen para poder umbralizar",
+                    "Mensaje",
+                    JOptionPane.INFORMATION_MESSAGE);        
     }//GEN-LAST:event_menuItemThresholdActionPerformed
 
     private void menuItemSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSaveActionPerformed
-        if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
-            Imgcodecs.imwrite(fc.getSelectedFile().getPath(), this.currentImage);
+        if (this.currentImage != null) {
+            if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
+                Imgcodecs.imwrite(fc.getSelectedFile().getPath(), this.currentImage);            
+        } else
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Debes abrir una imagen para poder guardarla",
+                    "Mensaje",
+                    JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_menuItemSaveActionPerformed
 
     private void menuItemExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemExitActionPerformed
@@ -192,7 +231,7 @@ public class MainWindow extends javax.swing.JFrame {
                 "Autores",
                 JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_menuItemAboutActionPerformed
-        
+    
     private Mat thresholding(Mat originalImage, Integer threshold) {
         Mat grayImage = new Mat(originalImage.rows(), originalImage.cols(), CvType.CV_8U);
         Mat thresholdizedImage = new Mat(originalImage.rows(), originalImage.cols(), CvType.CV_8U);

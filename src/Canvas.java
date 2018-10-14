@@ -1,8 +1,5 @@
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 public class Canvas extends JPanel{
@@ -17,13 +14,5 @@ public class Canvas extends JPanel{
     protected void showImage(BufferedImage image) {
         this.currentImage = image;
         repaint();
-    }
-    
-    protected BufferedImage getBufferedImage(File file) {
-        BufferedImage bI = null;
-        try {
-            bI = ImageIO.read(file);
-        } catch(IOException e) {}
-        return bI;
     }
 }
