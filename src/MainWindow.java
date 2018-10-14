@@ -277,7 +277,7 @@ public class MainWindow extends javax.swing.JFrame {
                     Imgcodecs.imwrite(fc.getSelectedFile().getPath(), this.modificatedImage);
                     JOptionPane.showMessageDialog(null, "La imagen se ha guardado correctamente", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
                 }catch(Exception e){
-                    JOptionPane.showMessageDialog(null, "Añada un extensión a la imagen \npor ejemplo nombre.jpg o nombre.png", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Añada una extensión a la imagen \npor ejemplo nombre.jpg o nombre.png", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
                 }
                 
             }
