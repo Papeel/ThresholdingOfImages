@@ -2,7 +2,7 @@
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
-import org.opencv.core.Core;
+
 
 public class Canvas extends JPanel{
     
