@@ -1,4 +1,3 @@
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -8,7 +7,6 @@ import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -30,15 +28,14 @@ import org.opencv.imgproc.Imgproc;
  */
 public class MainWindow extends javax.swing.JFrame {
 
-    
     public MainWindow() {
         initComponents();
         desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
     }
+    
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
-
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -149,35 +146,30 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void jMenuItemOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemOpenActionPerformed
-        FileFilter filter = null;
-        filter = new FileNameExtensionFilter("JPG imagen", "jpg");
-        fc.addChoosableFileFilter(filter);
-        filter = new FileNameExtensionFilter("PNG imagen", "png");
-        fc.addChoosableFileFilter(filter);
-        int res = fc.showOpenDialog(null);
-        if( res == JFileChooser.APPROVE_OPTION){
+        fc.addChoosableFileFilter(new FileNameExtensionFilter("JPG imagen", "jpg"));
+        fc.addChoosableFileFilter(new FileNameExtensionFilter("PNG imagen", "png"));
+        
+        if( fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION){
             Mat backup = this.currentImagen;
             this.currentImagen = Imgcodecs.imread(fc.getSelectedFile().getAbsolutePath());
             
             try{
                 JInternalFrame iW = createInternalWindow(this.currentImagen);
                 cleanDesktop();
-                this.count = 0;
-                configureInternalWindow(iW, false);
+                MainWindow.count = 0;
+                configureInternalWindow(iW, false, null);
                 
             }catch(Exception e){
                 JOptionPane.showMessageDialog(null, "La imagen no tiene un formato adecuado", "Mensaje", JOptionPane.ERROR_MESSAGE);
                 this.currentImagen=backup;
             }
-            
-            
         }
         fc.resetChoosableFileFilters();
     }//GEN-LAST:event_jMenuItemOpenActionPerformed
+    
     private void cleanDesktop(){
-        for (JInternalFrame v : desktop.getAllFrames()) {
+        for (JInternalFrame v : desktop.getAllFrames())
             v.dispose();
-        }
     }
     
     private JInternalFrame createInternalWindow(Mat image){
@@ -185,8 +177,12 @@ public class MainWindow extends javax.swing.JFrame {
         iW.setImage((BufferedImage)HighGui.toBufferedImage(image));
         return iW;
     }
-    private void configureInternalWindow(JInternalFrame iW, boolean close){
-        iW.setTitle(fc.getSelectedFile().getName());
+    
+    private void configureInternalWindow(JInternalFrame iW, boolean close, String title) {
+        if (title == null)
+            iW.setTitle(fc.getSelectedFile().getName());
+        else
+            iW.setTitle(title);
         iW.setClosable(close);
         iW.setMaximizable(true);
         iW.setIconifiable(true);
@@ -198,26 +194,24 @@ public class MainWindow extends javax.swing.JFrame {
         desktop.add(iW);
         iW.show();
     }
+    
     private void jMenuItemThresholdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemThresholdActionPerformed
-        if(this.currentImagen != null){
+        if (this.currentImagen != null) {
             String threshold = JOptionPane.showInputDialog(null, "Introduzca un umbral entre 0 y 255", "Selección de umbral", JOptionPane.PLAIN_MESSAGE);
             if(threshold == null)return;
             try{ 
                 int data = Integer.parseInt(threshold);
-                if(data>=0 && data<=255){
+                if (data >= 0 && data <= 255) {
                      JInternalFrame iw = createInternalWindow(umbralizar(this.currentImagen, data));
-                     configureInternalWindow(iw, true);
+                     configureInternalWindow(iw, true, threshold);
                 }else{
                     JOptionPane.showMessageDialog(null, "Debes añadir un número (entre 0 y 255) ", "Error", JOptionPane.ERROR_MESSAGE);
                 }
-                
-            }catch(Exception e){
+            } catch(Exception e) {
                 JOptionPane.showMessageDialog(null, "Debes añadir un número (entre 0 y 255) ", "Error", JOptionPane.ERROR_MESSAGE);
             }
-            
-            
             repaint();
-        }else{
+        } else {
             JOptionPane.showMessageDialog(null, "Debes abrir una imagen para poder umbralizar", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
         }
         
@@ -235,21 +229,17 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_JMenuAboutActionPerformed
 
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-        int shift = 10;
+        int shift = 30;
         for (JInternalFrame v : desktop.getAllFrames()) {
             int x = v.getX();
             int y = v.getY();
-            System.out.println(x + " "+ y);
-            if(x >= this.getWidth()){
-                    x = (this.getWidth() - v.getWidth() - shift);
-            }
-            if(y >= this.getHeight()){
-                    y = this.getHeight()- v.getHeight() - shift;
-            }
+            if(x >= this.getWidth() - 15)
+                x = this.getWidth() - shift - 15;
+            if(y >= this.getHeight() - 65)
+                y = this.getHeight() - shift - 65;
             v.setLocation(x, y);
         }
     }//GEN-LAST:event_formComponentResized
-    
     
     private BufferedImage getImage(File file) {
         BufferedImage bI = null;
@@ -258,7 +248,8 @@ public class MainWindow extends javax.swing.JFrame {
         } catch(IOException e) {}
         return bI;
     }
-     private Mat umbralizar(Mat imagen_original, Integer umbral) {
+    
+    private Mat umbralizar(Mat imagen_original, Integer umbral) {
         // crear dos imágenes en niveles de gris con el mismo tamaño que la original
         Mat imagenGris = new Mat(imagen_original.rows(), imagen_original.cols(), CvType.CV_8U);
         Mat imagenUmbralizada = new Mat(imagen_original.rows(), imagen_original.cols(),
@@ -308,7 +299,7 @@ CvType.CV_8U);
         });
     }
     private static int count = 0;
-    private JFileChooser fc  = new JFileChooser();
+    private final JFileChooser fc  = new JFileChooser();
     private Mat currentImagen;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem JMenuAbout;

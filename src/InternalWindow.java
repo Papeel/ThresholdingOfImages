@@ -1,9 +1,4 @@
-
 import java.awt.image.BufferedImage;
-import javax.swing.JDesktopPane;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import org.opencv.highgui.HighGui;
 
 /*
  * To change this license header, choose License Headers in Project Properties.

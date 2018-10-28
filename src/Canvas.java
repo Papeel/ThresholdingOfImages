@@ -1,15 +1,11 @@
-
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
-
 public class Canvas extends JPanel{
-    
     
     private BufferedImage currentImage;
     private String imagePath;
-    
     
     @Override
     public void paintComponent(Graphics g) {        
